@@ -3,11 +3,28 @@ const app = express();
 require('dotenv').config();
 const port = process.env.PORT 
 const dbConnect = require('./config/connection');
+const cors = require('cors')
+const corsOption = {
+    origin: ["http://localhost:5173", "http://localhost:5000"]
+}
+
+// Require Routes
+const authRoutes =  require('./routes/authRouter')
+const amdinRoutes = require('./routes/postRouter')
+const categoryRoutes = require('./routes/categoryRouter');
+const publicRouter = require('./routes/publicRouter')
 
 // Middleware 
-app.use(express.urlencoded({extended: true}));
+app.use(cors(corsOption));
 app.use(express.json());
-app.use(express.static('public'));
+
+// Routes
+app.use('/',publicRouter);
+app.use('/api/auth', authRoutes);
+app.use('/api/', amdinRoutes)
+app.use('/api/categories', categoryRoutes);
+
+app.use('/uploads', express.static('uploads'));
 
 dbConnect()
 .then(() => {
