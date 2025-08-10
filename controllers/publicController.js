@@ -97,6 +97,7 @@ exports.latestPosts = async (req, res) => {
             .limit(3)
             .populate('category')
             .populate({ path: 'category.parent', select: 'name'});
+        res.status(200).json(posts)
     }
     catch(err) {
         console.error('Error while fetching the latest posts: ', err);

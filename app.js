@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT 
+const path =  require('path');
 const dbConnect = require('./config/connection');
 const cors = require('cors')
 const corsOption = {
@@ -24,7 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/', amdinRoutes)
 app.use('/api/categories', categoryRoutes);
 
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 dbConnect()
 .then(() => {
