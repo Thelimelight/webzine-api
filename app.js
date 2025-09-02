@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 
 // Environment
 const port = process.env.PORT || 5000;
@@ -13,11 +14,21 @@ const isProd = process.env.NODE_ENV === 'production';
 // Database
 const dbConnect = require('./config/connection');
 
-// CORS Setup
+// ✅ Dynamic CORS Setup
+const allowedOrigins = [
+  'https://webzine.onrender.com',
+  'http://localhost:5173',
+];
+
 const corsOptions = {
-  origin: isProd
-    ? ['https://webzine-api.onrender.com']
-    : ['http://localhost:5173', 'http://localhost:5000'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
 };
 app.use(cors(corsOptions));
 
@@ -25,6 +36,14 @@ app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
+
+// ✅ Rate Limiting for API
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { message: 'Too many requests, please try again later.' },
+});
+app.use('/api', apiLimiter);
 
 // ✅ Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -41,7 +60,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/', publicRouter);
 
 // ✅ Static Files (Frontend - user interface)
-app.use('/', express.static(path.join(__dirname, 'dist')));
+app.use('/', express.static(path.join(__dirname, 'site-docs', 'dist')));
 app.get('*', (req, res, next) => {
   if (
     req.path.startsWith('/api') ||
@@ -50,12 +69,12 @@ app.get('*', (req, res, next) => {
   ) {
     return next();
   }
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'site-docs', 'dist', 'index.html'));
 });
 
 // ✅ Static Files (Frontend - admin panel)
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
-app.get('/admin/*path', (req, res) => {
+app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
 });
 
@@ -66,6 +85,17 @@ if (!isProd) {
     next();
   });
 }
+
+// ✅ 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// ✅ Error Handler
+app.use((err, req, res, next) => {
+  console.error('❌ Internal Server Error:', err.stack);
+  res.status(500).json({ message: 'Internal Server Error' });
+});
 
 // ✅ Start Server
 dbConnect()
