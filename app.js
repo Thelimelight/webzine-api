@@ -16,7 +16,7 @@ const dbConnect = require('./config/connection');
 // CORS Setup
 const corsOptions = {
   origin: isProd
-    ? ['https://your-production-domain.com']
+    ? ['https://webzine-api.onrender.com']
     : ['http://localhost:5173', 'http://localhost:5000'],
 };
 app.use(cors(corsOptions));
