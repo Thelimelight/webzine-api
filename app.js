@@ -15,10 +15,11 @@ const isProd = process.env.NODE_ENV === 'production';
 const dbConnect = require('./config/connection');
 
 // ✅ Dynamic CORS Setup — MUST be first
-const allowedOrigins = [
-  'https://webzine.onrender.com',
-  'http://localhost:5173',
-];
+// const allowedOrigins = [
+//   'https://webzine.onrender.com',
+//   'http://localhost:5173',
+// ];
+const allowedOrigins = ['*'];
 
 const corsOptions = {
   origin: function (origin, callback) {
