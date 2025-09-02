@@ -19,6 +19,7 @@ exports.getAllCategories = async (req, res) => {
     }
 }
 
+// ✅ Make sure this function exists and is exported correctly
 exports.getStructuredCategories = async (req, res) => {
     try {
         const mainCategories = await Category.find({ parent: null}).sort({ name: 1 });

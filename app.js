@@ -16,7 +16,7 @@ const dbConnect = require('./config/connection');
 // CORS Setup
 const corsOptions = {
   origin: isProd
-    ? ['http://localhost:5173'] // domain name
+    ? ['https://your-production-domain.com']
     : ['http://localhost:5173', 'http://localhost:5000'],
 };
 app.use(cors(corsOptions));
@@ -29,34 +29,16 @@ app.use(express.json());
 // ✅ Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ API Routes (Express 5–safe with try-catch)
-try {
-  const authRoutes = require('./routes/authRouter');
-  app.use('/api/auth', authRoutes);
-} catch (err) {
-  console.error('❌ Error loading authRouter:', err);
-}
+// ✅ API Routes
+const authRoutes = require('./routes/authRouter');
+const adminRoutes = require('./routes/postRouter');
+const categoryRoutes = require('./routes/categoryRouter');
+const publicRouter = require('./routes/publicRouter');
 
-try {
-  const adminRoutes = require('./routes/postRouter');
-  app.use('/api', adminRoutes);
-} catch (err) {
-  console.error('❌ Error loading postRouter:', err);
-}
-
-try {
-  const categoryRoutes = require('./routes/categoryRouter');
-  app.use('/api/categories', categoryRoutes);
-} catch (err) {
-  console.error('❌ Error loading categoryRouter:', err);
-}
-
-try {
-  const publicRouter = require('./routes/publicRouter');
-  app.use('/', publicRouter);
-} catch (err) {
-  console.error('❌ Error loading publicRouter:', err);
-}
+app.use('/api/auth', authRoutes);
+app.use('/api', adminRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/', publicRouter);
 
 // ✅ Static Files (Frontend - user interface)
 app.use('/', express.static(path.join(__dirname, 'dist')));
@@ -73,7 +55,7 @@ app.get('*', (req, res, next) => {
 
 // ✅ Static Files (Frontend - admin panel)
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
-app.get('/admin/*', (req, res) => {
+app.get('/admin/*path', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
 });
 
