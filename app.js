@@ -14,22 +14,8 @@ const isProd = process.env.NODE_ENV === 'production';
 // 🔗 Database Connection
 const dbConnect = require('./config/connection');
 
-// ✅ Dynamic CORS Setup — MUST be first
-// const allowedOrigins = [
-//   'https://webzine.onrender.com',
-//   'http://localhost:5173',
-// ];
-const allowedOrigins = ['*'];
-
 const corsOptions = {
-  origin: function (origin, callback) {
-    console.log('🌐 Incoming Origin:', origin);
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: '*',
   credentials: true,
 };
 
