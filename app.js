@@ -17,7 +17,7 @@ const dbConnect = require('./config/connection');
 // ✅ Dynamic CORS Setup
 const allowedOrigins = [
   'https://webzine.onrender.com',
-  // 'http://localhost:5173',
+  'http://localhost:5173',
 ];
 
 const corsOptions = {
