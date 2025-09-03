@@ -14,20 +14,33 @@ const isProd = process.env.NODE_ENV === 'production';
 // 🔗 Database Connection
 const dbConnect = require('./config/connection');
 
+const allowedOrigins = [
+  "https://webzine.onrender.com",
+  "http://localhost:5173", 
+];
+
 const corsOptions = {
-  origin: '*',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // ✅ Preflight support
 
-// 🛡️ Security & Performance
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
+
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
 
-// 🚦 Rate Limiting
+
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
