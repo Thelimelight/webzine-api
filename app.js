@@ -18,7 +18,7 @@ const dbConnect = require("./config/connection");
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5000",
-  "https://webzine.onrender.com"
+  "https://webzine.onrender.com",
 ];
 
 const corsOptions = {
