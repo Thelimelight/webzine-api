@@ -48,17 +48,15 @@ const apiLimiter = rateLimit({
 app.use("/api", apiLimiter);
 
 // 📁 Static Uploads
-app.use(
-  "/uploads",
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://webzine.onrender.com",
-    ],
-    credentials: true
-  }),
-  express.static(path.join(path.resolve(), "uploads"))
-);
+app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/uploads')) {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  next();
+})
 
 // 📦 API Routes
 const authRoutes = require("./routes/authRouter");
