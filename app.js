@@ -7,14 +7,14 @@ const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 
-// 🌍 Environment
+// Environment
 const port = process.env.PORT || 5000;
 const isProd = process.env.NODE_ENV === "production";
 
-// 🔗 Database Connection
+// Database Connection
 const dbConnect = require("./config/connection");
 
-// ✅ CORS Options
+// CORS Options
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5000",
@@ -29,17 +29,18 @@ const corsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
+  credentials: true,
 };
 
+// Global Middleware
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
-// 🛡️ Security & Performance
+app.options("*", cors(corsOptions)); // Preflight support
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// 🚦 Rate Limiting
+// Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -47,18 +48,33 @@ const apiLimiter = rateLimit({
 });
 app.use("/api", apiLimiter);
 
-// 📁 Static Uploads
-app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+app.use("/uploads", (req, res, next) => {
+  const origin = req.headers.origin;
 
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Vary", "Origin");
+  }
+
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    return res.sendStatus(204);
+  }
+
+  next();
+}, express.static(path.join(path.resolve(), "uploads")));
+
+// Optional: Log origin of image requests
 app.use((req, res, next) => {
-  if (req.path.startsWith('/uploads')) {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-    res.header('Access-Control-Allow-Credentials', 'true');
+  if (req.path.startsWith("/uploads")) {
+    console.log("🛰️ Upload request from origin:", req.headers.origin);
   }
   next();
-})
+});
 
-// 📦 API Routes
+// API Routes
 const authRoutes = require("./routes/authRouter");
 const adminRoutes = require("./routes/postRouter");
 const categoryRoutes = require("./routes/categoryRouter");
@@ -69,18 +85,18 @@ app.use("/api", adminRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/", publicRouter);
 
-// 🚫 404 Handler
+// 404 Handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// ❌ Error Handler
+// Error Handler
 app.use((err, req, res, next) => {
   console.error("❌ Internal Server Error:", err.stack);
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-// 🚀 Start Server
+// Start Server
 dbConnect()
   .then(() => {
     app.listen(port, () => {
