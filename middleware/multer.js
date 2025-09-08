@@ -7,11 +7,16 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname); // e.g., '.png'
-    const baseName = path.basename(file.originalname, ext); // e.g., 'Screenshot 2025-08-10 022926'
+    const originalName = file.originalname;
+    const ext = path.extname(originalName); // Extracts the last extension (e.g., '.png')
+
+    // Remove the extension from the original name
+    const baseName = originalName.slice(0, -ext.length);
 
     // Sanitize base name: replace spaces and remove special characters
-    const safeBaseName = baseName.replace(/\s+/g, '_').replace(/[^\w\-]/g, '');
+    const safeBaseName = baseName
+      .replace(/\s+/g, '_')           // Replace spaces with underscores
+      .replace(/[^\w\-]/g, '');       // Remove non-word characters except hyphens
 
     // Final filename: timestamp + sanitized name + extension
     const uniqueSuffix = `${Date.now()}-${safeBaseName}${ext}`;
