@@ -35,7 +35,9 @@ const corsOptions = {
 // Global Middleware
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // Preflight support
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false, 
+}));
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -54,6 +56,7 @@ app.use("/uploads", (req, res, next) => {
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     res.setHeader("Vary", "Origin");
   }
 
@@ -69,7 +72,8 @@ app.use("/uploads", (req, res, next) => {
 // Optional: Log origin of image requests
 app.use((req, res, next) => {
   if (req.path.startsWith("/uploads")) {
-    console.log("🛰️ Upload request from origin:", req.headers.origin);
+    const referer = req.headers.referer || "unknown";
+    console.log("🛰️ Upload request from referer:", referer);
   }
   next();
 });
