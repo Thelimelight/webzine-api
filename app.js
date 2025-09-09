@@ -35,9 +35,7 @@ const corsOptions = {
 // Global Middleware
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // Preflight support
-app.use(helmet({
-  crossOriginResourcePolicy: false, 
-}));
+app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
