@@ -1,8 +1,6 @@
 const cloudinary = require('cloudinary');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const CloudinaryStorage = require('multer-storage-cloudinary');
 const multer = require('multer');
-
-// issue check chatgpt it is in pending.................
 
 require('dotenv').config();
 
