@@ -57,8 +57,8 @@ exports.getCategoriesAsTree = async (req, res) => {
 
     const tree = [];
     categories.forEach(cat => {
-      if(cat.parent) {
-        map[cat.parent]?.children.push(map[cat._id]);
+      if (cat.parent && map[cat.parent]) {
+       map[cat.parent].children.push(map[cat._id]);
       } else {
         tree.push(map[cat._id]);
       }
