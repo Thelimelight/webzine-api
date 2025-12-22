@@ -10,8 +10,8 @@ exports.createPost = async (req, res) => {
     let imageData = {};
     if (req.file) {
       imageData = {
-        url: req.file.path,       
-        public_id: req.file.filename 
+        url: req.file.secure_url,       
+        public_id: req.file.public_id 
       };
     }
 
@@ -74,8 +74,8 @@ exports.updatePost = async (req, res) => {
       }
 
       post.image = {
-        url: req.file.path,
-        public_id: req.file.filename
+        url: req.file.secure_url,
+        public_id: req.file.public_id
       };
     }
 
