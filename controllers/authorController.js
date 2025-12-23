@@ -12,11 +12,15 @@ exports.createAuthor = async (req, res) => {
             return res.status(400).json({ success: false, msg: 'Author name is required' });
         }
 
+        if(!req.file) {
+          return res.status(400).json({ success: false, msg: 'Author image is required' });
+        }
+
         let imageData = {};
         if(req.file) {
           imageData = {
             url: req.file.path,
-            public_id: req.file.filename
+            public_id: req.file.filename  
           }
         };
 
