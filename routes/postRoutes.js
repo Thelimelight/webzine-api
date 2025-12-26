@@ -3,6 +3,7 @@ const {
     createPost,
     getPost,
     getPosts,
+    getPostByAuthor,
     updatePost,
     deletePost,
     getPostsByAdmin,
@@ -19,10 +20,10 @@ router.get('/admin', getPostsByAdmin);
 router.route('/:id')
     .get(getPost)
     .put(upload.single('image'), updatePost)
-    .delete(deletePost);
+    .delete(deletePost)
 
 
-router.route('/id')
+router.get('/author/:authorId', getPostByAuthor);
 
 
 module.exports = router;

@@ -54,6 +54,35 @@ exports.getPost = async (req, res) => {
     res.status(500).json({ success: false, msg: 'Server Error' });
   }
 };
+
+exports.getPostByAuthor = async (req, res) => {
+  try {
+    const { authorId } = req.params;
+
+    const author = await Author.findById(authorId);
+    if(!author) {
+      return res.status(404).json({
+        success: false,
+        msg: 'Author not found'
+      })
+    }
+
+    const posts = await Post.find({ author: authorId })
+      .populate({ path: 'author', select: 'name institution image'})
+      .populate({ path: 'category', select: 'name slug'})
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      author,
+      count: posts.length,
+      data: posts,
+    })
+  } catch (error) {
+    console.error('Error while getting posts by author', error);
+    res.status(500).json({ success: false, msg: 'Server Error' });
+  }
+};
 exports.updatePost = async (req, res) => {
   try {
     const { title, content, authorId, categoryId, status } = req.body;

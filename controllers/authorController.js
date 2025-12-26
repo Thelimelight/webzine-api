@@ -53,6 +53,7 @@ exports.getAuthors = async (req, res) => {
     res.status(500).json({ success: false, msg: 'Server Error' });
   }
 };
+
 exports.getAuthor = async (req, res) => {
   try {
     const author = await Author.findById(req.params.id);
@@ -66,6 +67,7 @@ exports.getAuthor = async (req, res) => {
     res.status(500).json({ success: false, msg: 'Server Error' });
   }
 };
+
 exports.updateAuthor = async (req, res) => {
   const { name, institution } = req.body;
   try {
